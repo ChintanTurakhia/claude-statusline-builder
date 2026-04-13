@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Claude Code Statusline Builder
+
+A visual editor for designing custom statuslines for [Claude Code](https://claude.ai/code). Pick segments, customize colors, see a live terminal preview, and export a ready-to-use script.
+
+![Statusline Builder Screenshot](screenshot.png)
+
+## Features
+
+- **6 preset templates** - Minimal, Developer, Dashboard, Cost Tracker, Git Power, Rate Watcher
+- **19 segment types** - Model, directory, git branch/status, context bar, cost, duration, tokens, rate limits, vim mode, and more
+- **Live terminal preview** - See your statusline rendered in a realistic terminal mockup as you edit
+- **Per-segment configuration** - ANSI color picker, bold toggle, prefix/suffix, bar width/style, threshold colors
+- **Multi-line support** - Build single or multi-line statuslines
+- **3-language export** - Generate scripts in Bash, Python, or Node.js
+- **Copy-paste ready** - Generated script, settings.json, and test command all with one-click copy
+- **Light & dark mode** - Toggle between themes; terminal and code blocks always stay dark
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Pick a template** or start from scratch
+2. **Add segments** from the palette (model name, git branch, context bar, cost, etc.)
+3. **Configure each segment** - click it to change color, prefix/suffix, and type-specific options
+4. **Copy the generated script** and save it to `~/.claude/statusline.sh`
+5. **Add the settings JSON** to `~/.claude/settings.json`
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js (App Router)
+- React + TypeScript
+- Tailwind CSS
+- shadcn/ui
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Claude Code Statusline Docs](https://code.claude.com/docs/en/statusline)
+- [Claude Code](https://claude.ai/code)

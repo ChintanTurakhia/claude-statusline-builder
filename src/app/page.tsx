@@ -1,65 +1,80 @@
-import Image from "next/image";
+import { ClientOnly } from "@/components/client-only";
+import { StatuslineBuilder } from "@/components/statusline-builder";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <svg className="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <polyline points="4 17 10 11 4 5" />
+                <line x1="12" y1="19" x2="20" y2="19" />
+              </svg>
+            </div>
+            <span className="text-sm font-semibold text-foreground tracking-tight">
+              Statusline Builder
+            </span>
+            <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-md">
+              Claude Code
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://code.claude.com/docs/en/statusline"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Docs
+            </a>
+            <ClientOnly>
+              <ThemeToggle />
+            </ClientOnly>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <div className="relative overflow-hidden border-b border-border/50">
+        <div className="grain absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.04] via-transparent to-transparent" />
+        <div className="relative z-10 max-w-6xl mx-auto px-6 py-16 md:py-20 text-center">
+          <h1 className="animate-fade-up font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground mb-4 italic">
+            Statusline Builder
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="animate-fade-up stagger-2 text-muted-foreground text-lg md:text-xl max-w-lg mx-auto leading-relaxed">
+            Craft your perfect Claude Code statusline.
+            <br className="hidden sm:block" />
+            <span className="text-foreground/70">Pick segments. Style them. Export.</span>
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+      </div>
+
+      {/* Builder */}
+      <div className="max-w-6xl mx-auto px-6 py-10">
+        <ClientOnly>
+          <StatuslineBuilder />
+        </ClientOnly>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-border/50 mt-8">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            Built for{" "}
+            <a href="https://claude.ai/code" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+              Claude Code
+            </a>
+          </span>
+          <a href="https://code.claude.com/docs/en/statusline" className="hover:text-foreground transition-colors" target="_blank" rel="noopener noreferrer">
             Documentation
           </a>
         </div>
-      </main>
-    </div>
+      </footer>
+    </main>
   );
 }
