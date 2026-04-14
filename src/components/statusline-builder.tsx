@@ -351,13 +351,13 @@ export function StatuslineBuilder() {
   );
 
   const moveSegment = useCallback(
-    (segId: string, direction: "up" | "down") => {
+    (segId: string, direction: "left" | "right") => {
       setLines((prev) => {
         const next = structuredClone(prev);
         for (const line of next) {
           const idx = line.segments.findIndex((s) => s.id === segId);
           if (idx === -1) continue;
-          const newIdx = direction === "up" ? idx - 1 : idx + 1;
+          const newIdx = direction === "left" ? idx - 1 : idx + 1;
           if (newIdx < 0 || newIdx >= line.segments.length) return prev;
           [line.segments[idx], line.segments[newIdx]] = [
             line.segments[newIdx],
@@ -366,6 +366,36 @@ export function StatuslineBuilder() {
           return next;
         }
         return prev;
+      });
+      setActivePreset("");
+    },
+    [],
+  );
+
+  const moveSegmentToLine = useCallback(
+    (segId: string, direction: "up" | "down") => {
+      setLines((prev) => {
+        const next = structuredClone(prev);
+        // Find which line the segment is in
+        let fromLineIdx = -1;
+        let segIdx = -1;
+        for (let i = 0; i < next.length; i++) {
+          const si = next[i].segments.findIndex((s) => s.id === segId);
+          if (si !== -1) {
+            fromLineIdx = i;
+            segIdx = si;
+            break;
+          }
+        }
+        if (fromLineIdx === -1) return prev;
+        const toLineIdx = direction === "up" ? fromLineIdx - 1 : fromLineIdx + 1;
+        if (toLineIdx < 0 || toLineIdx >= next.length) return prev;
+        // Remove from source line, add to target line
+        const [seg] = next[fromLineIdx].segments.splice(segIdx, 1);
+        next[toLineIdx].segments.push(seg);
+        // Remove empty lines (but keep at least one)
+        const filtered = next.filter((l) => l.segments.length > 0);
+        return filtered.length > 0 ? filtered : [createLine()];
       });
       setActivePreset("");
     },
@@ -533,7 +563,7 @@ export function StatuslineBuilder() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                moveSegment(seg.id, "up");
+                                moveSegment(seg.id, "left");
                               }}
                               className="hover:text-foreground"
                               title="Move left"
@@ -546,7 +576,7 @@ export function StatuslineBuilder() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                moveSegment(seg.id, "down");
+                                moveSegment(seg.id, "right");
                               }}
                               className="hover:text-foreground"
                               title="Move right"
@@ -556,6 +586,36 @@ export function StatuslineBuilder() {
                                 <polyline points="9 18 15 12 9 6" />
                               </svg>
                             </button>
+                            {lines.length > 1 && (
+                              <>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveSegmentToLine(seg.id, "up");
+                                  }}
+                                  className="hover:text-foreground"
+                                  title="Move to line above"
+                                  disabled={lineIdx === 0}
+                                >
+                                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                                    <polyline points="18 15 12 9 6 15" />
+                                  </svg>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveSegmentToLine(seg.id, "down");
+                                  }}
+                                  className="hover:text-foreground"
+                                  title="Move to line below"
+                                  disabled={lineIdx === lines.length - 1}
+                                >
+                                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                                    <polyline points="6 9 12 15 18 9" />
+                                  </svg>
+                                </button>
+                              </>
+                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -745,7 +805,11 @@ export function StatuslineBuilder() {
                 <CardTitle className="text-sm font-medium text-foreground">
                   Add Segments
                 </CardTitle>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Click to add to the last line</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {selectedLineIndex >= 0
+                    ? `Adding to Line ${selectedLineIndex + 1}`
+                    : `Adding to Line ${lines.length}`}
+                </p>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -761,7 +825,7 @@ export function StatuslineBuilder() {
                         onClick={() =>
                           addSegment(
                             def.type,
-                            Math.max(0, lines.length - 1),
+                            selectedLineIndex >= 0 ? selectedLineIndex : Math.max(0, lines.length - 1),
                           )
                         }
                         className="group flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all duration-150 text-xs border border-border hover:border-primary/30 cursor-pointer active:scale-95"
