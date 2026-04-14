@@ -833,3 +833,39 @@ export function generateTestCommand(scriptPath: string): string {
     },
   )}' | ${scriptPath}`;
 }
+
+// ─── Install Prompt Generator ───────────────────────────────────────────────
+
+const EXT_MAP: Record<string, string> = { bash: ".sh", python: ".py", node: ".js" };
+const LANG_MAP: Record<string, string> = { bash: "bash", python: "python", node: "javascript" };
+
+export function generateInstallPrompt(config: StatuslineConfig): string {
+  const ext = EXT_MAP[config.language];
+  const langLabel = LANG_MAP[config.language];
+  const scriptPath = `~/.claude/statusline${ext}`;
+
+  const script =
+    config.language === "bash"
+      ? generateBash(config)
+      : config.language === "python"
+        ? generatePython(config)
+        : generateNode(config);
+
+  const settingsJson = generateSettings(config, scriptPath);
+
+  return `Install this custom statusline for Claude Code:
+
+1. Save this script to ${scriptPath}:
+
+\`\`\`${langLabel}
+${script}
+\`\`\`
+
+2. Make it executable: \`chmod +x ${scriptPath}\`
+
+3. Read my ~/.claude/settings.json (create it if it doesn't exist), and merge in this config. Only add or update the "statusLine" key — do not remove or modify any other settings:
+
+\`\`\`json
+${settingsJson}
+\`\`\``;
+}

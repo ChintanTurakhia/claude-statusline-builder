@@ -11,6 +11,7 @@ import {
   generateNode,
   generateSettings,
   generateTestCommand,
+  generateInstallPrompt,
 } from "@/lib/generators";
 
 interface CodeOutputProps {
@@ -53,6 +54,44 @@ function CheckIcon() {
     <svg className="w-3.5 h-3.5 mr-1 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
+  );
+}
+
+function TerminalIcon() {
+  return (
+    <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <polyline points="4 17 10 11 4 5" />
+      <line x1="12" y1="19" x2="20" y2="19" />
+    </svg>
+  );
+}
+
+function CopyInstallButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }, [text]);
+
+  return (
+    <Button
+      variant="default"
+      onClick={handleCopy}
+      className="w-full h-11 text-sm font-semibold cursor-pointer"
+    >
+      {copied ? (
+        <>
+          <CheckIcon /> Copied! Now paste into Claude Code
+        </>
+      ) : (
+        <>
+          <TerminalIcon /> Copy Install Prompt
+        </>
+      )}
+    </Button>
   );
 }
 
@@ -128,6 +167,7 @@ export function CodeOutput({ config, onLanguageChange }: CodeOutputProps) {
   const scriptPath = `~/.claude/statusline${ext}`;
   const settingsJson = generateSettings(config, scriptPath);
   const testCmd = generateTestCommand(scriptPath);
+  const installPrompt = generateInstallPrompt(config);
 
   const highlighted =
     config.language === "bash"
@@ -138,6 +178,29 @@ export function CodeOutput({ config, onLanguageChange }: CodeOutputProps) {
 
   return (
     <div className="space-y-4">
+      {/* Quick Install */}
+      <Card className="border-primary/30 overflow-hidden bg-primary/[0.03]">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold text-foreground">
+            Quick Install
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Copy and paste into Claude Code — it handles the rest
+          </p>
+        </CardHeader>
+        <CardContent className="pt-0 space-y-3">
+          <CopyInstallButton text={installPrompt} />
+          <details className="group">
+            <summary className="text-[11px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors select-none">
+              Preview prompt
+            </summary>
+            <pre className="mt-2 text-[11px] leading-4 text-[#e4e4e7] p-3 bg-[#09090b] rounded-xl border border-[#27272a] font-mono overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap">
+              {installPrompt}
+            </pre>
+          </details>
+        </CardContent>
+      </Card>
+
       {/* Script output */}
       <Card className="border-border overflow-hidden">
         <CardHeader className="pb-2">
@@ -192,11 +255,11 @@ export function CodeOutput({ config, onLanguageChange }: CodeOutputProps) {
         </CardContent>
       </Card>
 
-      {/* Installation */}
+      {/* Manual Installation */}
       <Card className="border-border overflow-hidden">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-foreground">
-            Installation
+          <CardTitle className="text-sm font-semibold text-muted-foreground">
+            Manual Installation
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0 space-y-3">
