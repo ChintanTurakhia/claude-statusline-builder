@@ -478,38 +478,41 @@ export function StatuslineBuilder() {
         </div>
       </div>
 
-      {/* Terminal Preview */}
-      <div>
-        <h3 className="text-sm font-medium text-muted-foreground mb-3">
-          Live Preview
-        </h3>
+      {/* Terminal Preview - sticky */}
+      <div className="sticky top-14 z-30 -mx-6 px-6 py-4 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <TerminalPreview lines={lines} />
       </div>
 
-      {/* Two column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Segment management */}
-        <div className="space-y-4">
-          {/* Current segments */}
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-sm font-medium text-foreground">
-                    Your Statusline
-                  </CardTitle>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Click a segment to configure it</p>
+      {/* Step 1: Configure */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">1</span>
+          <h3 className="text-sm font-semibold text-foreground">Configure your statusline</h3>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Left: Segment management (3 cols) */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Current segments */}
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-sm font-medium text-foreground">
+                      Your Segments
+                    </CardTitle>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Click a segment to configure it</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={addLine}
+                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer"
+                  >
+                    <PlusIcon /> Add Line
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={addLine}
-                  className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-accent"
-                >
-                  <PlusIcon /> Add Line
-                </Button>
-              </div>
-            </CardHeader>
+              </CardHeader>
             <CardContent className="space-y-3">
               {lines.map((line, lineIdx) => (
                 <div key={line.id} className="space-y-1.5">
@@ -639,165 +642,6 @@ export function StatuslineBuilder() {
             </CardContent>
           </Card>
 
-          {/* Segment config panel */}
-          {selectedSegment && (
-            <Card className="bg-card border-primary/30">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <SegmentIcon
-                    type={
-                      SEGMENT_DEFINITIONS.find(
-                        (d) => d.type === selectedSegment.type,
-                      )?.icon ?? ""
-                    }
-                  />
-                  Configure:{" "}
-                  {SEGMENT_DEFINITIONS.find(
-                    (d) => d.type === selectedSegment.type,
-                  )?.name ?? selectedSegment.type}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Color */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Color</Label>
-                  <ColorPicker
-                    value={selectedSegment.color}
-                    onChange={(c) =>
-                      updateSegment(selectedSegment.id, { color: c })
-                    }
-                  />
-                </div>
-
-                {/* Bold */}
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs text-muted-foreground">Bold</Label>
-                  <Switch
-                    checked={selectedSegment.bold}
-                    onCheckedChange={(checked) =>
-                      updateSegment(selectedSegment.id, { bold: checked })
-                    }
-                  />
-                </div>
-
-                {/* Prefix/Suffix */}
-                {selectedSegment.type !== "separator" && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="seg-prefix" className="text-xs text-muted-foreground">Prefix</Label>
-                      <input
-                        id="seg-prefix"
-                        type="text"
-                        value={selectedSegment.prefix}
-                        onChange={(e) =>
-                          updateSegment(selectedSegment.id, {
-                            prefix: e.target.value,
-                          })
-                        }
-                        className="w-full h-8 px-2 text-xs bg-secondary border border-border rounded text-foreground focus:outline-none focus:border-ring"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="seg-suffix" className="text-xs text-muted-foreground">Suffix</Label>
-                      <input
-                        id="seg-suffix"
-                        type="text"
-                        value={selectedSegment.suffix}
-                        onChange={(e) =>
-                          updateSegment(selectedSegment.id, {
-                            suffix: e.target.value,
-                          })
-                        }
-                        className="w-full h-8 px-2 text-xs bg-secondary border border-border rounded text-foreground focus:outline-none focus:border-ring"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Custom text */}
-                {selectedSegment.type === "text" && (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="seg-text" className="text-xs text-muted-foreground">Text</Label>
-                    <input
-                      id="seg-text"
-                      type="text"
-                      value={selectedSegment.customText ?? ""}
-                      onChange={(e) =>
-                        updateSegment(selectedSegment.id, {
-                          customText: e.target.value,
-                        })
-                      }
-                      className="w-full h-8 px-2 text-xs bg-secondary border border-border rounded text-foreground focus:outline-none focus:border-ring"
-                    />
-                  </div>
-                )}
-
-                {/* Context bar options */}
-                {selectedSegment.type === "context_bar" && (
-                  <>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">
-                        Bar Width: {selectedSegment.barWidth ?? 10}
-                      </Label>
-                      <Slider
-                        value={[selectedSegment.barWidth ?? 10]}
-                        onValueChange={(v) =>
-                          updateSegment(selectedSegment.id, { barWidth: Array.isArray(v) ? v[0] : v })
-                        }
-                        min={5}
-                        max={30}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Bar Style</Label>
-                      <Select
-                        value={selectedSegment.barStyle ?? "blocks"}
-                        onValueChange={(v) =>
-                          updateSegment(selectedSegment.id, {
-                            barStyle: v as "blocks" | "hashes" | "dots",
-                          })
-                        }
-                      >
-                        <SelectTrigger className="h-8 text-xs bg-secondary border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-card border-border">
-                          <SelectItem value="blocks" className="text-xs">
-                            Blocks (\u2588\u2591)
-                          </SelectItem>
-                          <SelectItem value="hashes" className="text-xs">
-                            Hashes (#-)
-                          </SelectItem>
-                          <SelectItem value="dots" className="text-xs">
-                            Dots (\u25CF\u25CB)
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs text-muted-foreground">
-                        Threshold Colors
-                        <span className="block text-[10px] text-muted-foreground/70">
-                          Green &lt;70% / Yellow 70-89% / Red 90%+
-                        </span>
-                      </Label>
-                      <Switch
-                        checked={selectedSegment.thresholdColors ?? false}
-                        onCheckedChange={(checked) =>
-                          updateSegment(selectedSegment.id, {
-                            thresholdColors: checked,
-                          })
-                        }
-                      />
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
           {/* Segment palette */}
           <Card className="bg-card border-border">
             <CardHeader className="pb-2">
@@ -886,24 +730,12 @@ export function StatuslineBuilder() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border">
-                    <SelectItem value="off" className="text-xs">
-                      Off
-                    </SelectItem>
-                    <SelectItem value="1" className="text-xs">
-                      1s
-                    </SelectItem>
-                    <SelectItem value="5" className="text-xs">
-                      5s
-                    </SelectItem>
-                    <SelectItem value="10" className="text-xs">
-                      10s
-                    </SelectItem>
-                    <SelectItem value="30" className="text-xs">
-                      30s
-                    </SelectItem>
-                    <SelectItem value="60" className="text-xs">
-                      60s
-                    </SelectItem>
+                    <SelectItem value="off" className="text-xs">Off</SelectItem>
+                    <SelectItem value="1" className="text-xs">1s</SelectItem>
+                    <SelectItem value="5" className="text-xs">5s</SelectItem>
+                    <SelectItem value="10" className="text-xs">10s</SelectItem>
+                    <SelectItem value="30" className="text-xs">30s</SelectItem>
+                    <SelectItem value="60" className="text-xs">60s</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -911,10 +743,180 @@ export function StatuslineBuilder() {
           </Card>
         </div>
 
-        {/* Right: Code output */}
-        <div>
-          <CodeOutput config={config} onLanguageChange={setLanguage} />
+          {/* Right: Configure panel (2 cols) */}
+          <div className="lg:col-span-2">
+            {selectedSegment ? (
+              <div className="lg:sticky lg:top-[180px]">
+                <Card className="bg-card border-primary/30">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <SegmentIcon
+                        type={
+                          SEGMENT_DEFINITIONS.find(
+                            (d) => d.type === selectedSegment.type,
+                          )?.icon ?? ""
+                        }
+                      />
+                      Configure:{" "}
+                      {SEGMENT_DEFINITIONS.find(
+                        (d) => d.type === selectedSegment.type,
+                      )?.name ?? selectedSegment.type}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Color */}
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Color</Label>
+                      <ColorPicker
+                        value={selectedSegment.color}
+                        onChange={(c) =>
+                          updateSegment(selectedSegment.id, { color: c })
+                        }
+                      />
+                    </div>
+
+                    {/* Bold */}
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-muted-foreground">Bold</Label>
+                      <Switch
+                        checked={selectedSegment.bold}
+                        onCheckedChange={(checked) =>
+                          updateSegment(selectedSegment.id, { bold: checked })
+                        }
+                      />
+                    </div>
+
+                    {/* Prefix/Suffix */}
+                    {selectedSegment.type !== "separator" && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="seg-prefix" className="text-xs text-muted-foreground">Prefix</Label>
+                          <input
+                            id="seg-prefix"
+                            type="text"
+                            value={selectedSegment.prefix}
+                            onChange={(e) =>
+                              updateSegment(selectedSegment.id, {
+                                prefix: e.target.value,
+                              })
+                            }
+                            className="w-full h-8 px-2 text-xs bg-secondary border border-border rounded text-foreground focus:outline-none focus:border-ring"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="seg-suffix" className="text-xs text-muted-foreground">Suffix</Label>
+                          <input
+                            id="seg-suffix"
+                            type="text"
+                            value={selectedSegment.suffix}
+                            onChange={(e) =>
+                              updateSegment(selectedSegment.id, {
+                                suffix: e.target.value,
+                              })
+                            }
+                            className="w-full h-8 px-2 text-xs bg-secondary border border-border rounded text-foreground focus:outline-none focus:border-ring"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Custom text */}
+                    {selectedSegment.type === "text" && (
+                      <div className="space-y-1.5">
+                        <Label htmlFor="seg-text" className="text-xs text-muted-foreground">Text</Label>
+                        <input
+                          id="seg-text"
+                          type="text"
+                          value={selectedSegment.customText ?? ""}
+                          onChange={(e) =>
+                            updateSegment(selectedSegment.id, {
+                              customText: e.target.value,
+                            })
+                          }
+                          className="w-full h-8 px-2 text-xs bg-secondary border border-border rounded text-foreground focus:outline-none focus:border-ring"
+                        />
+                      </div>
+                    )}
+
+                    {/* Context bar options */}
+                    {selectedSegment.type === "context_bar" && (
+                      <>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">
+                            Bar Width: {selectedSegment.barWidth ?? 10}
+                          </Label>
+                          <Slider
+                            value={[selectedSegment.barWidth ?? 10]}
+                            onValueChange={(v) =>
+                              updateSegment(selectedSegment.id, { barWidth: Array.isArray(v) ? v[0] : v })
+                            }
+                            min={5}
+                            max={30}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">Bar Style</Label>
+                          <Select
+                            value={selectedSegment.barStyle ?? "blocks"}
+                            onValueChange={(v) =>
+                              updateSegment(selectedSegment.id, {
+                                barStyle: v as "blocks" | "hashes" | "dots",
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-8 text-xs bg-secondary border-border">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-card border-border">
+                              <SelectItem value="blocks" className="text-xs">Blocks ({"\u2588\u2591"})</SelectItem>
+                              <SelectItem value="hashes" className="text-xs">Hashes (#-)</SelectItem>
+                              <SelectItem value="dots" className="text-xs">Dots ({"\u25CF\u25CB"})</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-muted-foreground">
+                            Threshold Colors
+                            <span className="block text-[10px] text-muted-foreground/70">
+                              Green &lt;70% / Yellow 70-89% / Red 90%+
+                            </span>
+                          </Label>
+                          <Switch
+                            checked={selectedSegment.thresholdColors ?? false}
+                            onCheckedChange={(checked) =>
+                              updateSegment(selectedSegment.id, {
+                                thresholdColors: checked,
+                              })
+                            }
+                          />
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <Card className="bg-card border-border border-dashed">
+                <CardContent className="py-12 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Click a segment to configure it
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Step 2: Install */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">2</span>
+          <h3 className="text-sm font-semibold text-foreground">Install your statusline</h3>
+        </div>
+        <CodeOutput config={config} onLanguageChange={setLanguage} />
       </div>
     </div>
   );
